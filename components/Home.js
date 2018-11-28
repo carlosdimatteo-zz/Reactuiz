@@ -7,10 +7,12 @@ export default class Home extends React.Component {
     constructor(){
         super()
         this.state={
-            questions=[],
-            correct=0,
+            questions:[],
+            correct:0,
+            currentQuestionIndex:0,
             currentQuestion:{}
         }
+        this.getData()
     }
 
     static navigationOptions = {
@@ -27,7 +29,8 @@ export default class Home extends React.Component {
                 questions:data.results,
                 questionCount:data.results.length(),
                 correct:0,
-                currentQuestion:data.results[0]
+                currentQuestion:data.results[0],
+                currentQuestionIndex:0
             })
         })
     }
@@ -41,26 +44,31 @@ export default class Home extends React.Component {
         }else{
             console.log('answered incorrectly !!')
         }
-        this.setState({currentQuestion:this.questions[questionIndex+1]})
+        if(questionIndex<=this.state.questions.length()-1){
+            this.setState({
+                currentQuestionIndex:questionIndex+1,
+                currentQuestion:this.questions[questionIndex+1]
+            })
+        }else{
+            this.props.navigation.navigate('Score',{correctCount:this.state.correct,questionQuantity:this.state.questions.length()})
+        }
+        
     }
 
     
         render() {
 
           return (
-            <View>
-            {this.state.questions.forEach(question,index => {
                 <View>
-                <Text>Question:{question.question} </Text>
-                <Button onPress={()=>this.evaluateAnswer(index,'True')}>
+                <Text>Question:{this.state.currentQuestion.question} </Text>
+                <Button onPress={()=>this.evaluateAnswer(this.state.currentQuestionIndex,'True')}>
                     True
                 </Button>
-                <Button onPress={()=>evaluateAnswer(index,'False')}>
+                <Button onPress={()=>evaluateAnswer(this.state.currentQuestionIndex,'False')}>
                 False
                 </Button>
                 </View>
-            })}
-            </View>
+           
             
             
           )
